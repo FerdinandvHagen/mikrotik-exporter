@@ -1,0 +1,11 @@
+[Unit]
+Description=Service for exporting prometheus metrics for the three mikrotik routers
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/home/pi/run.sh
+
+[Install]
+WantedBy=multi-user.target
