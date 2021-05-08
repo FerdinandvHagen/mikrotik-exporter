@@ -22,7 +22,7 @@ func newBandwidthCollector() routerOSCollector {
 }
 
 func (c *bandwidthCollector) init() {
-	c.props = []string{"name", "rx-packets-per-second", "rx-packets-per-second", "rx-drops-per-second", "rx-errors-per-second", "rx-bits-per-second", "tx-packets-per-second", "tx-drops-per-second", "tx-errors-per-second", "tx-bits-per-second"}
+	c.props = []string{"rx-packets-per-second", "rx-packets-per-second", "rx-drops-per-second", "rx-errors-per-second", "rx-bits-per-second", "tx-packets-per-second", "tx-drops-per-second", "tx-errors-per-second", "tx-bits-per-second"}
 
 	labelNames := []string{"name", "address", "interface", "type", "disabled", "comment", "running", "slave"}
 	c.descriptions = make(map[string]*prometheus.Desc)
@@ -97,7 +97,7 @@ func (c *bandwidthCollector) collectMetricForProperty(property string, re *proto
 				return
 			}
 		}
-		ctx.ch <- prometheus.MustNewConstMetric(desc, prometheus.CounterValue, v, ctx.device.Name, ctx.device.Address,
+		ctx.ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, v, ctx.device.Name, ctx.device.Address,
 			re.Map["name"], re.Map["type"], re.Map["disabled"], re.Map["comment"], re.Map["running"], re.Map["slave"])
 	}
 }
