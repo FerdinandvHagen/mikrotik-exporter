@@ -1,6 +1,7 @@
 package collector
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
@@ -22,11 +23,11 @@ func newBandwidthCollector() routerOSCollector {
 }
 
 func (c *bandwidthCollector) init() {
-	c.props = []string{"name", "rx-packets-per-second", "rx-drops-per-second", "rx-errors-per-second", "rx-bits-per-second", "tx-packets-per-second", "tx-drops-per-second", "tx-errors-per-second", "tx-bits-per-second"}
+	c.props = []string{"name", "rx-packets-per-second", "rx-bits-per-second", "tx-bits-per-second", "tx-packets-per-second"}
 
 	labelNames := []string{"name", "address", "interface", "type", "disabled", "comment", "running", "slave"}
 	c.descriptions = make(map[string]*prometheus.Desc)
-	for _, p := range c.props[5:] {
+	for _, p := range c.props[1:] {
 		c.descriptions[p] = descriptionForPropertyName("interface", p, labelNames)
 	}
 }
@@ -65,16 +66,18 @@ func (c *bandwidthCollector) fetch(ctx *collectorContext) ([]*proto.Sentence, er
 }
 
 func (c *bandwidthCollector) collectForStat(re *proto.Sentence, ctx *collectorContext) {
-	for _, p := range c.props[5:] {
+	for _, p := range c.props[1:] {
+		fmt.Println("collectMetricForProperty", p)
 		c.collectMetricForProperty(p, re, ctx)
 	}
 }
 
 func (c *bandwidthCollector) collectMetricForProperty(property string, re *proto.Sentence, ctx *collectorContext) {
 	desc := c.descriptions[property]
+
 	if value := re.Map[property]; value != "" {
 		var (
-			v   float64
+			v   int64
 			err error
 		)
 		switch property {
@@ -85,7 +88,7 @@ func (c *bandwidthCollector) collectMetricForProperty(property string, re *proto
 				v = 0
 			}
 		default:
-			v, err = strconv.ParseFloat(value, 64)
+			v, err = strconv.ParseInt(value, 10, 64)
 			if err != nil {
 				log.WithFields(log.Fields{
 					"device":    ctx.device.Name,
@@ -97,7 +100,10 @@ func (c *bandwidthCollector) collectMetricForProperty(property string, re *proto
 				return
 			}
 		}
-		ctx.ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, v, ctx.device.Name, ctx.device.Address,
+
+		fmt.Println("Sending metric...")
+
+		ctx.ch <- prometheus.MustNewConstMetric(desc, prometheus.GaugeValue, float64(v), ctx.device.Name, ctx.device.Address,
 			re.Map["name"], re.Map["type"], re.Map["disabled"], re.Map["comment"], re.Map["running"], re.Map["slave"])
 	}
 }
