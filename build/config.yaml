@@ -1,16 +1,13 @@
 devices:
   - name: gateway
-    address: 10.10.0.1
-    port: 9000
+    address: 192.168.88.1
     user: prometheus
     password: %PASS%
   - name: router_4_1
-    address: 10.10.0.2
-    port: 9000
+    address: 192.168.88.2
     user: prometheus
     password: %PASS%
   - name: router_4_2
-    address: 10.10.0.3
-    port: 9000
+    address: 192.168.88.3
     user: prometheus
     password: %PASS%
