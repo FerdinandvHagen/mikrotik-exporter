@@ -29,6 +29,7 @@ type Config struct {
 		Ipsec     bool `yaml:"ipsec,omitempty"`
 		Lte       bool `yaml:"lte,omitempty"`
 		Netwatch  bool `yaml:"netwatch,omitempty"`
+		Bandwidth bool `yaml:"bandwidth,omitempty"`
 	} `yaml:"features,omitempty"`
 }
 

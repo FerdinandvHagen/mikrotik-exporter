@@ -54,6 +54,7 @@ var (
 	withIpsec     = flag.Bool("with-ipsec", false, "retrieves ipsec metrics")
 	withLte       = flag.Bool("with-lte", false, "retrieves lte metrics")
 	withNetwatch  = flag.Bool("with-netwatch", false, "retrieves netwatch metrics")
+	withBandwidth = flag.Bool("with-bandwidth", false, "retrieves bandwidth metrics")
 
 	cfg *config.Config
 
@@ -261,6 +262,10 @@ func collectorOptions() []collector.Option {
 
 	if *withNetwatch || cfg.Features.Netwatch {
 		opts = append(opts, collector.WithNetwatch())
+	}
+
+	if *withBandwidth || cfg.Features.Bandwidth {
+		opts = append(opts, collector.WithBandwidth())
 	}
 
 	if *timeout != collector.DefaultTimeout {

@@ -196,6 +196,12 @@ func WithNetwatch() Option {
 	}
 }
 
+func WithBandwidth() Option {
+	return func(c *collector) {
+		c.collectors = append(c.collectors, newBandwidthCollector())
+	}
+}
+
 // Option applies options to collector
 type Option func(*collector)
 
@@ -211,6 +217,7 @@ func NewCollector(cfg *config.Config, opts ...Option) (prometheus.Collector, err
 		collectors: []routerOSCollector{
 			newInterfaceCollector(),
 			newResourceCollector(),
+			newBandwidthCollector(),
 		},
 	}
 
@@ -343,8 +350,11 @@ func (c *collector) connectAndCollect(d *config.Device, ch chan<- prometheus.Met
 	}
 	defer cl.Close()
 
-	for _, co := range c.collectors {
+	for i, co := range c.collectors {
 		ctx := &collectorContext{ch, d, cl}
+
+		log.WithField("i", i).Debug("Collecting")
+
 		err = co.collect(ctx)
 		if err != nil {
 			return err
@@ -400,6 +410,7 @@ func (c *collector) connect(d *config.Device) (*routeros.Client, error) {
 	if !ok {
 		// Login method post-6.43 one stage, cleartext and no challenge
 		if r.Done != nil {
+			log.WithField("device", d.Name).Debug("done wth login")
 			return client, nil
 		}
 		return nil, errors.New("RouterOS: /login: no ret (challenge) received")
@@ -415,6 +426,7 @@ func (c *collector) connect(d *config.Device) (*routeros.Client, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	log.WithField("device", d.Name).Debug("done wth login")
 
 	return client, nil
