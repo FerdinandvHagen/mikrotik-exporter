@@ -22,7 +22,7 @@ func newBandwidthCollector() routerOSCollector {
 }
 
 func (c *bandwidthCollector) init() {
-	c.props = []string{"rx-packets-per-second", "rx-packets-per-second", "rx-drops-per-second", "rx-errors-per-second", "rx-bits-per-second", "tx-packets-per-second", "tx-drops-per-second", "tx-errors-per-second", "tx-bits-per-second"}
+	c.props = []string{"name", "rx-packets-per-second", "rx-drops-per-second", "rx-errors-per-second", "rx-bits-per-second", "tx-packets-per-second", "tx-drops-per-second", "tx-errors-per-second", "tx-bits-per-second"}
 
 	labelNames := []string{"name", "address", "interface", "type", "disabled", "comment", "running", "slave"}
 	c.descriptions = make(map[string]*prometheus.Desc)
